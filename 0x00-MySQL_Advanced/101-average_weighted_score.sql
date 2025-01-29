@@ -1,31 +1,17 @@
--- script that creates a stored procedure ComputeAverageWeightedScoreForUser
--- that computes and store the average weighted score for a student
+-- creates a stored procedure ComputeAverageWeightedScoreForUsers
+-- that computes and stores the average weighted score for all students
 
-DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUser;
-
-DELIMITER //
-
-CREATE PROCEDURE ComputeAverageWeightedScoreForUser(user_id INT)
+DROP PROCEDURE IF EXISTS ComputeAverageWeightedScoreForUsers;
+DELIMITER |
+CREATE PROCEDURE ComputeAverageWeightedScoreForUsers()
 BEGIN
-  DECLARE tot_weighted_score INT DEFAULT 0;
-  DECLARE tot_weight INT DEFAULT 0;
-
-  SELECT SUM(corrections.score * projects.weight) INTO tot_weighted_score
-  FROM corrections 
-  INNER JOIN projects ON corrections.project_id = projects.id
-  WHERE corrections.user_id = user_id;
-
-  SELECT SUM(projects.weight) INTO tot_weight FROM corrections
-  INNER JOIN projects ON corrections.project_id = projects.id
-  WHERE corrections.user_id = user_id;
-
-  IF tot_weight = 0 THEN
-    UPDATE users
-    SET users.average_score = 0
-    WHERE users.id = user_id;
-  ELSE
-    UPDATE users
-    SET users.average_score = tot_weighted_score / tot_weight
-    WHERE users.id = user_id;
-    END IF;
-END //
+  UPDATE users AS U, 
+    (SELECT U.id, SUM(score * weight) / SUM(weight) AS w_avg 
+    FROM users AS U 
+    JOIN corrections as C ON U.id=C.user_id 
+    JOIN projects AS P ON C.project_id=P.id 
+    GROUP BY U.id)
+  AS WA
+  SET U.average_score = WA.w_avg 
+  WHERE U.id=WA.id;
+END;
