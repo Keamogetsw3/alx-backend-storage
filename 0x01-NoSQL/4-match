@@ -1,2 +1,2 @@
-// Find all documents in a collection
-db.school.find({"name": "ALX"});
+// find in a collection school with attr name equals to ALX
+db.school.find({name:"ALX"})
