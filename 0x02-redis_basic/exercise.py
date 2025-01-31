@@ -30,7 +30,7 @@ def call_history(method: Callable) -> Callable:
         and result in Redis before returning the output.'''
         in_key = f'{method.__qualname__}:inputs'
         out_key = f'{method.__qualname__}:outputs'
- 
+
         if isinstance(self._redis, redis.Redis):
             self._redis.rpush(in_key, str(args))
 
@@ -38,7 +38,7 @@ def call_history(method: Callable) -> Callable:
 
         if isinstance(self._redis, redis.Redis):
             self._redis.rpush(out_key, output)
- 
+
         return output
     return invoker
 
@@ -68,7 +68,7 @@ def replay(fn: Callable) -> None:
 
 
 class Cache:
-    '''A class for storing and retrieving data in Redis.''' 
+    '''A class for storing and retrieving data in Redis.'''
     def __init__(self) -> None:
         '''Initializes a Redis client and clears any existing data.'''
         self._redis = redis.Redis()
