@@ -20,7 +20,7 @@ def data_cacher(method: Callable) -> Callable:
     @wraps(method)
     def invoker(url: str) -> str:
         '''Increments the request count,
-        retrieves cached data if available, 
+        retrieves cached data if available,
         or fetches and caches the response if not.
         '''
         # Increment the request count for the given URL
